@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+import moviepy.editor as mp
 from moviepy.editor import VideoFileClip
 
 app = FastAPI()
