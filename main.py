@@ -20,8 +20,9 @@ async def home(request: Request):
     # This renders your home.html file
     return templates.TemplateResponse("home.html", {"request": request})
 
-@app.post("/upload")
-async def handle_upload(
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
     request: Request, 
     video_file: UploadFile = File(...),
     start_time: int = Form(...),  
