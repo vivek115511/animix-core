@@ -31,11 +31,9 @@ async def handle_upload(
     remove_audio: str = Form(None),
     generate_thumb: str = Form(None)   
 ): 
-    # Clean filename for safety
     base_name = video_file.filename.split('.')[0].replace(" ", "_")
     input_path = f"processed_videos/raw_{video_file.filename}"
     
-    # Extension handling
     ext = "mp4"
     if export_type == "audio": ext = "mp3"
     elif export_type == "gif": ext = "gif"
@@ -44,50 +42,37 @@ async def handle_upload(
     output_path = f"processed_videos/{output_filename}"
     thumb_name = f"thumb_{base_name}.jpg" if generate_thumb == "true" else None
 
-    # Save uploaded file
     with open(input_path, "wb") as buffer:
         shutil.copyfileobj(video_file.file, buffer)
 
     duration = max(1, end_time - start_time)
     
-    # 2. CORE FFmpeg LOGIC
-    # Base command: Trim and Input
+    # 2. CORE FFmpeg COMMAND
     cmd = ["ffmpeg", "-y", "-ss", str(start_time), "-t", str(duration), "-i", input_path]
 
     if export_type == "audio":
-        # Professional Audio Extract
         cmd += ["-vn", "-acodec", "libmp3lame", "-b:a", "192k", output_path]
-    
     elif export_type == "gif":
-        # High Quality Meme GIF
         cmd += ["-vf", "fps=10,scale=480:-1:flags=lanczos", output_path]
-    
     else:
-        # VIDEO PROCESSING (Vertical Crop & Quality)
-        # We use (iw-ow)/2 to ensure the 9:16 crop is exactly in the center
+        # Vertical Logic using (iw-ow)/2 for centering
         v_filter = f"scale=-1:{'480' if quality == '480p' else '720'}"
         if aspect_ratio == "vertical":
             v_filter = f"crop=ih*9/16:ih:(iw-ow)/2:0,scale=-1:{'480' if quality == '480p' else '720'}"
         
         cmd += ["-vf", v_filter]
-        
-        # Mute Logic
         if remove_audio == "true":
             cmd += ["-an"]
         else:
             cmd += ["-c:a", "aac", "-b:a", "128k"]
-            
-        # Fast encoding for Render Free Tier
         cmd += ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "28", output_path]
 
     try:
-        # Run Video/Audio processing
         subprocess.run(cmd, check=True)
         
-        # 3. THUMBNAIL GENERATION
+        # 3. THUMBNAIL
         if thumb_name:
             thumb_path = f"processed_videos/{thumb_name}"
-            # Snaps frame 0.5s into the clip to avoid black frames
             subprocess.run([
                 "ffmpeg", "-y", "-ss", str(start_time + 0.5), "-i", input_path, 
                 "-vframes", "1", "-q:v", "2", thumb_path
@@ -99,4 +84,4 @@ async def handle_upload(
         })
 
     except Exception as e:
-        return HTMLResponse(content=f"Animix Engine Error: {str(e)}", status_code=500)
+        return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
