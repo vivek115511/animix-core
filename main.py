@@ -35,7 +35,7 @@ async def handle_upload(
 
     try:
         clip = VideoFileClip(temp_input_path)
-        short_clip = clip.subclipped(start_time, end_time) 
+        short_clip = clip.subclip(start_time, end_time)
         
         if aspect_ratio == "vertical":
             w, h = short_clip.size
