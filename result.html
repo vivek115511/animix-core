@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animix | Success!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans">
+
+    <nav class="p-6 bg-white shadow-sm flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-blue-600">Animix.ai</h1>
+        <a href="/" class="text-slate-600 hover:text-blue-600 font-medium">&larr; Upload Another</a>
+    </nav>
+
+    <main class="max-w-5xl mx-auto mt-12 px-6 text-center">
+        <div class="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold mb-6">
+            ✨ Processed Successfully
+        </div>
+        <h2 class="text-4xl font-extrabold tracking-tight mb-8">Your Media is Ready.</h2>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-10">
+            
+            <div class="bg-black p-4 rounded-2xl shadow-xl flex flex-col justify-center items-center">
+                {% if video_name.endswith('.mp3') %}
+                    <audio controls class="w-full mt-10 mb-10"><source src="/videos/{{ video_name }}" type="audio/mpeg"></audio>
+                    <p class="text-white mb-4 font-bold">Audio Track Extracted 🎵</p>
+                {% else %}
+                    <video controls autoplay loop class="w-full rounded-xl shadow-lg border border-slate-800">
+                        <source src="/videos/{{ video_name }}">
+                    </video>
+                {% endif %}
+                <a href="/videos/{{ video_name }}" download class="mt-6 w-full bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all text-center">
+                    ⬇️ Download Media
+                </a>
+            </div>
+
+            {% if thumb_name %}
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">📸 YouTube Thumbnail</h3>
+                    <p class="text-sm text-slate-500 mb-4">Auto-generated high-quality frame for your social media cover.</p>
+                    <img src="/videos/{{ thumb_name }}" alt="Video Thumbnail" class="w-full rounded-xl shadow border border-slate-100 mb-6">
+                </div>
+                <a href="/videos/{{ thumb_name }}" download class="w-full bg-slate-100 border-2 border-slate-300 text-slate-800 px-6 py-3 rounded-xl font-bold text-lg hover:bg-slate-200 transition-all text-center">
+                    ⬇️ Download Thumbnail Image
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+
+</body>
+</html>
