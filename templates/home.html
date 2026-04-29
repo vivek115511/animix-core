@@ -7,29 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-10">
+<body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans">
 
     <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
-        <div class="bg-slate-900 p-6 text-center">
-            <h1 class="text-3xl font-black text-white tracking-tighter">ANIMIX <span class="text-blue-400">CORE</span></h1>
+        <div class="bg-slate-900 p-5 text-center">
+            <h1 class="text-2xl font-black text-white tracking-tighter">ANIMIX <span class="text-blue-400">PREVIEW STAGE</span></h1>
         </div>
 
-        <form action="/upload" method="post" enctype="multipart/form-data" class="p-6 space-y-6">
+        <form action="/upload" method="post" enctype="multipart/form-data" class="p-6 space-y-5">
             
-            <label for="v_up" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:bg-slate-50 transition-all">
+            <label id="upload-label" for="v_up" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:bg-slate-50 transition-all">
                 <i class="fas fa-video text-3xl text-slate-400 mb-2"></i>
                 <p id="fname" class="text-sm font-bold text-slate-600">Click to Select Video</p>
-                <input type="file" id="v_up" name="video_file" class="hidden" required onchange="document.getElementById('fname').innerText = 'File: ' + this.files[0].name" />
+                <input type="file" id="v_up" name="video_file" class="hidden" accept="video/*" required onchange="previewVideo(this)" />
             </label>
+
+            <div id="preview-container" class="hidden w-full bg-black rounded-2xl overflow-hidden shadow-inner aspect-video">
+                <video id="video-preview" controls class="w-full h-full"></video>
+            </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase">Start (sec)</label>
-                    <input type="number" name="start_time" value="0" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                    <input type="number" name="start_time" value="0" step="1" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase">End (sec)</label>
-                    <input type="number" name="end_time" value="5" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                    <input type="number" name="end_time" value="5" step="1" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
                 </div>
             </div>
 
@@ -45,27 +49,37 @@
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ratio</label>
                     <select name="aspect_ratio" class="w-full bg-white border p-3 rounded-xl text-sm font-bold">
-                        <option value="landscape">Landscape</option>
+                        <option value="landscape">Landscape (Original)</option>
                         <option value="vertical">Vertical (9:16)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between px-2 text-sm font-bold text-slate-600">
-                <label class="flex items-center">
-                    <input type="checkbox" name="remove_audio" value="true" class="mr-2 w-4 h-4"> Mute
-                </label>
-                <label class="flex items-center">
-                    <input type="checkbox" name="generate_thumb" value="true" checked class="mr-2 w-4 h-4"> Thumbnail
-                </label>
-            </div>
-
-            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-5 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center">
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center">
                 <i class="fas fa-bolt mr-3"></i> Start Rendering
             </button>
             
         </form>
     </div>
+
+    <script>
+        function previewVideo(input) {
+            const file = input.files[0];
+            const preview = document.getElementById('video-preview');
+            const container = document.getElementById('preview-container');
+            const label = document.getElementById('upload-label');
+            const fname = document.getElementById('fname');
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+                preview.src = url;
+                container.classList.remove('hidden'); // Show the video player
+                label.classList.add('bg-green-50', 'border-green-200'); // Light green feedback
+                fname.innerText = "Current: " + file.name;
+                fname.style.color = "#16a34a";
+            }
+        }
+    </script>
 
 </body>
 </html>
