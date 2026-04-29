@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animix | Pro Media Repurposer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans pb-20">
+
+    <nav class="p-6 bg-white shadow-sm flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-blue-600">Animix.ai</h1>
+        <div class="space-x-4">
+            <a href="#" class="text-slate-600 hover:text-blue-600">Dashboard</a>
+            <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium">Pricing</a>
+        </div>
+    </nav>
+
+    <div class="w-full bg-slate-100 py-4 mb-8 border-b border-slate-200 flex flex-col items-center justify-center">
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-2">Advertisement</p>
+        <div class="w-[728px] max-w-full h-[90px] bg-slate-200 border-2 border-slate-300 border-dashed rounded flex items-center justify-center">
+            <span class="text-slate-500 font-medium text-sm">Real Ad Will Appear Here</span>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-extrabold tracking-tight mb-4">
+            The Smart Repurposer.
+        </h2>
+        <p class="text-lg text-slate-600 mb-8">Select your footage, preview the timeline, and export.</p>
+
+        <div class="bg-white p-10 rounded-2xl shadow-xl border border-slate-100">
+            
+            <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-6">
+                
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 hover:border-blue-500 transition-colors">
+                    <input type="file" name="video_file" id="video_file" class="hidden" accept="video/*" required>
+                    <label for="video_file" class="cursor-pointer text-slate-500 block w-full h-full">
+                        <span class="text-blue-600 font-semibold underline" id="uploadText">Click to select video</span>
+                    </label>
+                </div>
+
+                <div id="previewContainer" class="hidden bg-black rounded-xl overflow-hidden shadow-lg border border-slate-800">
+                    <p class="text-slate-300 text-xs py-2 font-semibold bg-slate-900 tracking-wider uppercase">Live Preview</p>
+                    <video id="videoPreview" controls class="w-full max-h-96"></video>
+                </div>
+
+                <div class="flex space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="w-1/2 text-left">
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Start (sec)</label>
+                        <input type="number" name="start_time" value="0" min="0" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div class="w-1/2 text-left">
+                        <label class="block text-sm font-bold text-slate-700 mb-1">End (sec)</label>
+                        <input type="number" name="end_time" value="5" min="1" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200 text-left shadow-inner">
+                    <h3 class="text-md font-extrabold text-blue-900 mb-4 flex items-center">
+                        <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded mr-2">PRO</span> Creator Tools
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Export Type</label>
+                            <select name="export_type" class="w-full p-2 border rounded-lg bg-white">
+                                <option value="mp4">Video (.mp4)</option>
+                                <option value="gif">Looping Meme (.gif)</option>
+                                <option value="mp3">Audio Only (.mp3)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Aspect Ratio</label>
+                            <select name="aspect_ratio" class="w-full p-2 border rounded-lg bg-white">
+                                <option value="original">Keep Original Size</option>
+                                <option value="vertical">Vertical Crop (TikTok 9:16)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Video Quality (File Size)</label>
+                        <select name="quality" class="w-full p-2 border rounded-lg bg-white">
+                            <option value="high">High Quality (Original)</option>
+                            <option value="480p">Web / Mobile Compressed (480p)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 pt-4 border-t border-blue-200">
+                        <label class="flex items-center space-x-3 cursor-pointer group">
+                            <input type="checkbox" name="remove_audio" value="true" class="w-5 h-5 text-blue-600 rounded">
+                            <span class="font-bold text-slate-700 group-hover:text-blue-600">Mute Video (Remove Background Wind)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer group">
+                            <input type="checkbox" name="generate_thumb" value="true" checked class="w-5 h-5 text-blue-600 rounded">
+                            <span class="font-bold text-slate-700 group-hover:text-blue-600">Generate YouTube Thumbnail (.jpg)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-slate-800 transition-all shadow-lg">
+                    ⚡ Process Creator Media
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const fileInput = document.getElementById('video_file');
+        const previewContainer = document.getElementById('previewContainer');
+        const videoPreview = document.getElementById('videoPreview');
+        const uploadText = document.getElementById('uploadText');
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadText.innerText = "Selected: " + file.name;
+                const videoURL = URL.createObjectURL(file);
+                videoPreview.src = videoURL;
+                previewContainer.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
