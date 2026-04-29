@@ -18,12 +18,13 @@
         <form action="/upload" method="post" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             
             <div class="p-8 border-b border-dashed border-slate-200">
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors">
+                <label for="video_upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
                         <i class="fas fa-cloud-upload-alt text-blue-500 text-3xl mb-2"></i>
-                        <p class="text-sm text-blue-600 font-semibold">Click to select video</p>
+                        <p class="text-sm text-blue-600 font-semibold" id="file-name-display">Click to select video</p>
+                        <p class="text-[10px] text-slate-400 mt-1">MP4, MOV, or AVI (Max 10MB recommended)</p>
                     </div>
-                    <input type="file" name="video_file" class="hidden" required />
+                    <input type="file" id="video_upload" name="video_file" class="hidden" required onchange="updateFileName(this)" />
                 </label>
             </div>
 
@@ -66,29 +67,4 @@
                     <div class="mt-6">
                         <label class="block text-xs font-bold text-slate-600 mb-2">Video Quality (File Size)</label>
                         <select name="quality" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm">
-                            <option value="720p">High Quality (Original)</option>
-                            <option value="480p">Standard (Small File)</option>
-                        </select>
-                    </div>
-
-                    <div class="mt-6 space-y-3">
-                        <label class="flex items-center text-sm font-medium text-slate-700">
-                            <input type="checkbox" name="remove_audio" value="true" class="w-4 h-4 text-blue-600 rounded mr-3">
-                            Mute Video (Remove Background Wind)
-                        </label>
-                        <label class="flex items-center text-sm font-medium text-slate-700">
-                            <input type="checkbox" name="generate_thumb" value="true" checked class="w-4 h-4 text-blue-600 rounded mr-3">
-                            Generate YouTube Thumbnail (.jpg)
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center">
-                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
-                    Process Creator Media
-                </button>
-            </div>
-        </form>
-    </div>
-</body>
-</html>
+                            <option value="720p">High Quality
