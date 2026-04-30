@@ -1,45 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Export Complete | Animix</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+import os
+import shutil
+import subprocess
+from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI()
+
+# SETUP FOLDERS
+os.makedirs("processed_videos", exist_ok=True)
+os.makedirs("templates", exist_ok=True)
+
+app.mount("/videos", StaticFiles(directory="processed_videos"), name="videos")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse(request, "home.html")
+
+@app.post("/upload")
+async def handle_upload(
+    request: Request, 
+    video_file: UploadFile = File(...),
+    start_time: int = Form(0),  
+    end_time: int = Form(5),
+    export_type: str = Form("video"), 
+    aspect_ratio: str = Form("landscape"),
+    quality: str = Form("720p"),          
+    remove_audio: str = Form(None)
+): 
+    base_name = video_file.filename.split('.')[0].replace(" ", "_")
+    input_path = f"processed_videos/raw_{video_file.filename}"
     
-    <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script>
-</head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-md w-full bg-slate-800 rounded-3xl p-8 shadow-2xl text-center">
-        <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i class="fas fa-check text-2xl"></i>
-        </div>
-        <h2 class="text-2xl font-bold mb-2">Export Complete!</h2>
-        <p class="text-slate-400 mb-8 text-sm">Your file has been processed and is ready.</p>
+    ext = "mp4"
+    if export_type == "audio": 
+        ext = "mp3"
+    
+    output_filename = f"animix_{base_name}.{ext}"
+    output_path = f"processed_videos/{output_filename}"
 
-        <div class="space-y-4">
-            <a href="/videos/{{ video_name }}" download class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors">
-                <i class="fas fa-download mr-2"></i> Download Result
-            </a>
-            <a href="/" class="block w-full text-slate-400 hover:text-white text-sm font-medium py-2 transition-colors">
-                Create Another Project
-            </a>
-        </div>
+    with open(input_path, "wb") as buffer:
+        shutil.copyfileobj(video_file.file, buffer)
 
-        <!-- ANIMIX AD ZONE: Result Page -->
-        <div class="mt-8 border-t border-slate-700 pt-6">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-YOUR_CLIENT_ID"
-                 data-ad-slot="YOUR_SLOT_ID"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
-</body>
-</html>
+    duration = max(1, end_time - start_time)
+    
+    cmd = ["ffmpeg", "-y", "-ss", str(start_time), "-t", str(duration), "-i", input_path]
+
+    if export_type == "audio":
+        cmd += ["-vn", "-acodec", "libmp3lame", "-b:a", "192k", output_path]
+    else:
+        v_filter = f"scale=-1:{'480' if quality == '480p' else '720'}"
+        if aspect_ratio == "vertical":
+            v_filter = f"crop=ih*9/16:ih:(iw-ow)/2:0,scale=-1:{'480' if quality == '480p' else '720'}"
+        
+        cmd += ["-vf", v_filter]
+        
+        if remove_audio == "true":
+            cmd += ["-an"]
+        else:
+            cmd += ["-c:a", "aac", "-b:a", "128k"]
+            
+        cmd += ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "28", output_path]
+
+    try:
+        subprocess.run(cmd, check=True)
+        return templates.TemplateResponse(request, "result.html", {"video_name": output_filename})
+    except Exception as e:
+        return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
