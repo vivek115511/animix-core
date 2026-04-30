@@ -1,5 +1,3 @@
-
-    
 import os
 import shutil
 import subprocess
@@ -82,4 +80,5 @@ async def handle_upload(
         })
 
     except Exception as e:
-        return HTMLResponse(content=f"Error: {str(e)}", status_code=500
+        # FIXED: Added the missing parenthesis at the end of this line
+        return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
