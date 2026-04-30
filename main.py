@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-# SETUP FOLDERS
+# 1. SETUP FOLDERS
 os.makedirs("processed_videos", exist_ok=True)
 os.makedirs("templates", exist_ok=True)
 
@@ -40,18 +40,23 @@ async def handle_upload(
     output_filename = f"animix_{base_name}.{ext}"
     output_path = f"processed_videos/{output_filename}"
 
-    with open(input_path, "wb") as buffer:
-        shutil.copyfileobj(video_file.file, buffer)
+    # CHUNKED STREAMING (Saves Memory for Heavy Files)
+    try:
+        with open(input_path, "wb") as buffer:
+            while chunk := await video_file.read(1024 * 1024): # Read 1MB at a time
+                buffer.write(chunk)
+    except Exception as e:
+        return HTMLResponse(content=f"Upload Failed: {str(e)}", status_code=500)
 
     duration = max(1, end_time - start_time)
     
-    # PERFORMANCE OPTIMIZED FFMPEG COMMAND
+    # ULTRA-LOW LOAD COMMAND
     cmd = ["ffmpeg", "-y", "-ss", str(start_time), "-t", str(duration), "-i", input_path]
 
     if export_type == "audio":
         cmd += ["-vn", "-acodec", "libmp3lame", "-b:a", "128k", output_path]
     else:
-        # Use 480p as default for speed on free servers
+        # Lowering to 480p and using "ultrafast" to save CPU
         v_filter = "scale=-2:480" 
         if aspect_ratio == "vertical":
             v_filter = "crop=ih*9/16:ih:(iw-ow)/2:0,scale=-2:480"
@@ -61,15 +66,15 @@ async def handle_upload(
         if remove_audio == "true":
             cmd += ["-an"]
         else:
-            cmd += ["-c:a", "aac", "-b:a", "64k"] # Lower audio bitrate for speed
+            cmd += ["-c:a", "aac", "-b:a", "64k"]
             
-        # preset superfast is the key to stopping the "too much time" error
-        cmd += ["-c:v", "libx264", "-preset", "superfast", "-crf", "32", output_path]
+        cmd += ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "35", output_path]
 
     try:
-        subprocess.run(cmd, check=True, timeout=60) # Timeout after 60 seconds
+        # Increased timeout to 120 seconds for heavy files
+        subprocess.run(cmd, check=True, timeout=120)
         return templates.TemplateResponse(request, "result.html", {"video_name": output_filename})
     except subprocess.TimeoutExpired:
-        return HTMLResponse(content="Error: Processing took too long. Try a shorter clip.", status_code=504)
+        return HTMLResponse(content="Render Timeout: This file is too heavy for a free server. Try a smaller file.", status_code=504)
     except Exception as e:
-        return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
+        return HTMLResponse(content=f"Processing Error: {str(e)}", status_code=500)
