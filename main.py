@@ -27,7 +27,7 @@ async def handle_upload(
     end_time: int = Form(5),
     export_type: str = Form("video"), 
     aspect_ratio: str = Form("landscape"),
-    quality: str = Form("720p"),          
+    quality: str = Form("480p"),          
     remove_audio: str = Form(None)
 ): 
     base_name = video_file.filename.split('.')[0].replace(" ", "_")
@@ -45,26 +45,31 @@ async def handle_upload(
 
     duration = max(1, end_time - start_time)
     
+    # PERFORMANCE OPTIMIZED FFMPEG COMMAND
     cmd = ["ffmpeg", "-y", "-ss", str(start_time), "-t", str(duration), "-i", input_path]
 
     if export_type == "audio":
-        cmd += ["-vn", "-acodec", "libmp3lame", "-b:a", "192k", output_path]
+        cmd += ["-vn", "-acodec", "libmp3lame", "-b:a", "128k", output_path]
     else:
-        v_filter = f"scale=-1:{'480' if quality == '480p' else '720'}"
+        # Use 480p as default for speed on free servers
+        v_filter = "scale=-2:480" 
         if aspect_ratio == "vertical":
-            v_filter = f"crop=ih*9/16:ih:(iw-ow)/2:0,scale=-1:{'480' if quality == '480p' else '720'}"
+            v_filter = "crop=ih*9/16:ih:(iw-ow)/2:0,scale=-2:480"
         
         cmd += ["-vf", v_filter]
         
         if remove_audio == "true":
             cmd += ["-an"]
         else:
-            cmd += ["-c:a", "aac", "-b:a", "128k"]
+            cmd += ["-c:a", "aac", "-b:a", "64k"] # Lower audio bitrate for speed
             
-        cmd += ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "28", output_path]
+        # preset superfast is the key to stopping the "too much time" error
+        cmd += ["-c:v", "libx264", "-preset", "superfast", "-crf", "32", output_path]
 
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, timeout=60) # Timeout after 60 seconds
         return templates.TemplateResponse(request, "result.html", {"video_name": output_filename})
+    except subprocess.TimeoutExpired:
+        return HTMLResponse(content="Error: Processing took too long. Try a shorter clip.", status_code=504)
     except Exception as e:
         return HTMLResponse(content=f"Error: {str(e)}", status_code=500)
