@@ -6,6 +6,9 @@
     <title>Animix | Core Media Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script>
 </head>
 <body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans">
 
@@ -68,7 +71,7 @@
                 </select>
             </div>
 
-            <!-- MUTE OPTION (Centered now that thumbnail is gone) -->
+            <!-- MUTE OPTION -->
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-center">
                 <label class="flex items-center text-sm font-bold text-slate-700 cursor-pointer">
                     <input type="checkbox" name="remove_audio" value="true" class="mr-2 w-5 h-5 rounded text-blue-600"> 
@@ -80,8 +83,21 @@
             <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center">
                 <i class="fas fa-bolt mr-3"></i> Start Rendering
             </button>
-            
         </form>
+
+        <!-- ANIMIX AD ZONE: Home Page -->
+        <div class="bg-slate-50 border-t border-slate-200 p-4 text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Advertisement</span>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_CLIENT_ID"
+                 data-ad-slot="YOUR_SLOT_ID"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
     </div>
 
     <script>
