@@ -3,100 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animix | Core Media Editor</title>
+    <title>Animix | Core Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script>
 </head>
 <body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans">
-
     <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
-        <!-- Header -->
         <div class="bg-slate-900 p-5 text-center">
-            <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Animix <span class="text-blue-400">Core</span></h1>
+            <h1 class="text-2xl font-black text-white uppercase tracking-tighter">Animix <span class="text-blue-400">Core</span></h1>
         </div>
 
         <form action="/upload" method="post" enctype="multipart/form-data" class="p-6 space-y-5">
-            
-            <!-- UPLOAD BOX -->
             <label id="upload-label" for="v_up" class="block w-full border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:bg-slate-50 transition-all">
                 <i class="fas fa-video text-3xl text-slate-400 mb-2"></i>
                 <p id="fname" class="text-sm font-bold text-slate-600">Click to Select Video</p>
                 <input type="file" id="v_up" name="video_file" class="hidden" accept="video/*" required onchange="previewVideo(this)" />
             </label>
 
-            <!-- PREVIEW STAGE -->
             <div id="preview-container" class="hidden w-full bg-black rounded-2xl overflow-hidden shadow-inner aspect-video">
                 <video id="video-preview" controls class="w-full h-full"></video>
             </div>
 
-            <!-- TRIMMING -->
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Start (sec)</label>
-                    <input type="number" name="start_time" value="0" class="w-full bg-slate-50 border p-3 rounded-xl font-bold outline-none">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">End (sec)</label>
-                    <input type="number" name="end_time" value="5" class="w-full bg-slate-50 border p-3 rounded-xl font-bold outline-none">
-                </div>
+                <input type="number" name="start_time" value="0" placeholder="Start (sec)" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                <input type="number" name="end_time" value="5" placeholder="End (sec)" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
             </div>
 
-            <!-- EXPORT SETTINGS -->
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Format</label>
-                    <select name="export_type" class="w-full bg-white border p-3 rounded-xl text-sm font-bold cursor-pointer">
-                        <option value="video">Video (.mp4)</option>
-                        <option value="audio">Audio Only (.mp3)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Aspect Ratio</label>
-                    <select name="aspect_ratio" class="w-full bg-white border p-3 rounded-xl text-sm font-bold cursor-pointer">
-                        <option value="landscape">Landscape (16:9)</option>
-                        <option value="vertical">Vertical (9:16)</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- QUALITY SETTING -->
-            <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Video Quality</label>
-                <select name="quality" class="w-full bg-white border p-3 rounded-xl text-sm font-bold cursor-pointer">
-                    <option value="720p">High Quality (720p)</option>
-                    <option value="480p">Standard (480p - Faster)</option>
+                <select name="export_type" class="w-full bg-white border p-3 rounded-xl text-sm font-bold">
+                    <option value="video">Video (.mp4)</option>
+                    <option value="audio">Audio (.mp3)</option>
+                </select>
+                <select name="aspect_ratio" class="w-full bg-white border p-3 rounded-xl text-sm font-bold">
+                    <option value="landscape">Landscape</option>
+                    <option value="vertical">Vertical (9:16)</option>
                 </select>
             </div>
 
-            <!-- MUTE OPTION -->
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-center">
                 <label class="flex items-center text-sm font-bold text-slate-700 cursor-pointer">
-                    <input type="checkbox" name="remove_audio" value="true" class="mr-2 w-5 h-5 rounded text-blue-600"> 
-                    <i class="fas fa-volume-mute mr-2 text-slate-400"></i> Mute Original Audio
+                    <input type="checkbox" name="remove_audio" value="true" class="mr-2 w-5 h-5 rounded text-blue-600"> Mute Audio
                 </label>
             </div>
 
-            <!-- PROCESS BUTTON -->
-            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center">
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl uppercase tracking-widest flex items-center justify-center">
                 <i class="fas fa-bolt mr-3"></i> Start Rendering
             </button>
         </form>
 
-        <!-- ANIMIX AD ZONE: Home Page -->
-        <div class="bg-slate-50 border-t border-slate-200 p-4 text-center">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-YOUR_CLIENT_ID"
-                 data-ad-slot="YOUR_SLOT_ID"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
+        <!-- Placeholder for Ads -->
+        <div class="p-4 bg-slate-50 border-t text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+            Ad Space (Ready for AdSense)
         </div>
     </div>
 
@@ -105,14 +62,11 @@
             const file = input.files[0];
             const preview = document.getElementById('video-preview');
             const container = document.getElementById('preview-container');
-            const fname = document.getElementById('fname');
-
             if (file) {
                 const url = URL.createObjectURL(file);
                 preview.src = url;
                 container.classList.remove('hidden');
-                fname.innerText = "Ready: " + file.name;
-                fname.style.color = "#16a34a";
+                document.getElementById('fname').innerText = "Ready: " + file.name;
             }
         }
     </script>
