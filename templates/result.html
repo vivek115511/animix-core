@@ -13,13 +13,7 @@
             <i class="fas fa-check text-2xl"></i>
         </div>
         <h2 class="text-2xl font-bold mb-2">Export Complete!</h2>
-        <p class="text-slate-400 mb-8 text-sm">Your media has been repurposed and is ready.</p>
-
-        {% if thumb_name %}
-        <div class="mb-6 rounded-xl overflow-hidden border-2 border-slate-700">
-            <img src="/videos/{{ thumb_name }}" class="w-full h-auto">
-        </div>
-        {% endif %}
+        <p class="text-slate-400 mb-8 text-sm">Your file has been processed and is ready.</p>
 
         <div class="space-y-4">
             <a href="/videos/{{ video_name }}" download class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors">
